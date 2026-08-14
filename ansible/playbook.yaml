@@ -1,0 +1,50 @@
+- name: Test connection to GitOps server
+  hosts: gitops
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - curl
+          - git
+          - unzip
+          - htop
+        state: present
+
+
+    - name: Check GitOps application directory
+      ansible.builtin.file:
+        path: /opt/gitops-platform
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    
+    - name: Check server connectivity
+      ansible.builtin.ping:
+
+    - name: Check K3s installation
+      ansible.builtin.command: k3s --version
+      register: k3s_version
+      changed_when: false
+
+    - name: check htop installation
+      ansible.builtin.command: htop --version
+      changed_when: false
+
+    - name: Show K3s version
+      ansible.builtin.debug:
+        var: k3s_version.stdout
+
+    - name: Ensure K3s service is running
+      ansible.builtin.service:
+        name: k3s
+        state: started
+        enabled: true
+    
