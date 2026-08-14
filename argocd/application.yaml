@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: 'https://github.com/mohassan521/gitops-platform.git'
     targetRevision: main
-    path: helm
+    path: helm/gitops-platform
 
   destination:
     server: 'https://kubernetes.default.svc'
