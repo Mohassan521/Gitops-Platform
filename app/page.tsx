@@ -48,14 +48,14 @@ export default function Home() {
             </p>
           </div>
 
-          <a
+          {/* <a
             href="/api/health"
             target="_blank"
             rel="noreferrer"
             className="inline-flex w-fit items-center justify-center rounded-lg bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
           >
             Check Health API
-          </a>
+          </a> */}
         </header>
 
         <section className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
