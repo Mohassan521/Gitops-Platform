@@ -13,6 +13,6 @@ spec:
       name: letsencrypt-pod-key
     
     solvers:
-      - http01
+      - http01:
           ingress:
             ingressClassName: traefik  
