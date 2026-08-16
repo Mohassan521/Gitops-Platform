@@ -5,9 +5,17 @@ kind: Ingress
 
 metadata:
   name: gitops-platform
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-pod
+    # kubernetes.io/ingress.class: traefik
 
 spec:
   ingressClassName: traefik
+
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: gitops-platform-tls
 
   rules:
     - host: {{ .Values.ingress.host }}

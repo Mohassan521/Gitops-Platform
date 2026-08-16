@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+
+metadata:
+  name: letsencrypt-pod
+
+spec:
+  acme:
+    email: "hassanlatif14021999@gmail.com"
+    server: "https://acme-v02.api.letsencrypt.org/directory"
+
+    privateKeySecretRef:
+      name: letsencrypt-pod-key
+    
+    solvers:
+      - http01
+          ingress:
+            ingressClassName: traefik  
