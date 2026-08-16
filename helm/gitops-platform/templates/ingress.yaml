@@ -6,7 +6,7 @@ kind: Ingress
 metadata:
   name: gitops-platform
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-pod
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     # kubernetes.io/ingress.class: traefik
 
 spec:
