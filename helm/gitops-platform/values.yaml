@@ -4,7 +4,7 @@ replicaCount: 3
 
 image:
   repository: ghcr.io/mohassan521/gitops-platform
-  tag: b237ee13bfe9b4ae9ab13ba3b6c1d71a44d91c4d
+  tag: 5403e19b79a8b7c2a52c0aff1c64e27f7aeaf738
   pullPolicy: IfNotPresent
 
 service:
