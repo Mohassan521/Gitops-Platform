@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gitops-platform
+  name: {{ .Values.appName }}
 
 spec:
   replicas: {{ .Values.replicaCount }}
 
   selector:
     matchLabels:
-      app: gitops-platform
+      app: {{ .Values.appName }}
 
   template:
     metadata:
       labels:
-        app: gitops-platform
+        app: {{ .Values.appName }}
   
     spec:
       containers:
-        - name: gitops-platform
+        - name: {{ .Values.appName }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.service.port }}

@@ -1,3 +1,5 @@
+appName: gitops-platform
+
 replicaCount: 3
 
 image:

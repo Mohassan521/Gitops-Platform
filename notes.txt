@@ -1,0 +1,3 @@
+So technically actual application container port 3000 par chal rahi hai. Service port 3000 us application tak pohanchne ka Kubernetes-level stable gateway hai.
+
+Aur public user Service ko directly hit nahi kar raha — user → Traefik/Ingress → Service → Pod ja raha hai.

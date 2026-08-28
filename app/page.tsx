@@ -1,9 +1,18 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+
 const deploymentInfo = {
-  application: process.env.NEXT_PUBLIC_APP_NAME || "GitOps Control Center",
-  environment: process.env.NEXT_PUBLIC_ENVIRONMENT || "Development",
-  version: process.env.NEXT_PUBLIC_APP_VERSION || "v1.0.0",
-  commitSha: process.env.NEXT_PUBLIC_COMMIT_SHA || "local-build",
-  deployedAt: process.env.NEXT_PUBLIC_DEPLOYED_AT || "Not deployed yet",
+  application:
+    process.env.NEXT_PUBLIC_APP_NAME || "GitOps Control Center",
+  environment:
+    process.env.NEXT_PUBLIC_ENVIRONMENT || "Development",
+  version:
+    process.env.NEXT_PUBLIC_APP_VERSION || "v1.0.0",
+  commitSha:
+    process.env.NEXT_PUBLIC_COMMIT_SHA || "local-build",
+  deployedAt:
+    process.env.NEXT_PUBLIC_DEPLOYED_AT || "Not deployed yet",
 };
 
 const services = [
@@ -14,20 +23,48 @@ const services = [
     endpoint: "/",
   },
   {
-    name: "Health API",
-    description: "Application health endpoint used by Kubernetes probes.",
+    name: "ArgoCD",
+    description: "GitOps controller managing desired cluster state.",
     status: "Healthy",
-    endpoint: "/api/health",
+    endpoint: "Synced",
   },
   {
-    name: "GitOps Deployment",
-    description: "ArgoCD integration will be added in an upcoming phase.",
-    status: "Pending",
-    endpoint: "Not configured",
+    name: "Kubernetes",
+    description: "K3s cluster running application workloads.",
+    status: "Healthy",
+    endpoint: "K3s",
   },
 ];
 
+type ApplicationForm = {
+  appName: string;
+  repoUrl: string;
+  branch: string;
+  containerPort: string;
+  servicePort: string;
+  replicas: string;
+};
+
 export default function Home() {
+  const [showModal, setShowModal] = useState(false);
+
+  const [form, setForm] = useState<ApplicationForm>({
+    appName: "",
+    repoUrl: "",
+    branch: "main",
+    containerPort: "3000",
+    servicePort: "3000",
+    replicas: "1",
+  });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    console.log("Application onboarding request:", form);
+
+    setShowModal(false);
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
@@ -43,19 +80,17 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 max-w-2xl text-slate-400">
-              Production-style dashboard for deployments, environments,
-              application health and GitOps infrastructure.
+              Deploy and manage applications through an automated GitOps
+              workflow.
             </p>
           </div>
 
-          {/* <a
-            href="/api/health"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            onClick={() => setShowModal(true)}
             className="inline-flex w-fit items-center justify-center rounded-lg bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
           >
-            Check Health API
-          </a> */}
+            + Add Application
+          </button>
         </header>
 
         <section className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -102,7 +137,6 @@ export default function Home() {
                   <div>
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold">{service.name}</h3>
-
                       <StatusBadge status={service.status} />
                     </div>
 
@@ -152,11 +186,13 @@ export default function Home() {
             </div>
 
             <div className="mt-8 rounded-xl border border-blue-500/20 bg-blue-500/10 p-4">
-              <p className="font-medium text-blue-300">Next Milestone</p>
+              <p className="font-medium text-blue-300">
+                Current Milestone
+              </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-400">
-                Containerize this application with Docker and prepare it for
-                automated CI builds.
+                Building reusable application onboarding for multiple
+                developers and repositories.
               </p>
             </div>
           </aside>
@@ -167,7 +203,145 @@ export default function Home() {
           learning
         </footer>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-wider text-emerald-400">
+                  Application Onboarding
+                </p>
+
+                <h2 className="mt-2 text-2xl font-semibold">
+                  Add Application
+                </h2>
+
+                <p className="mt-2 text-sm text-slate-400">
+                  Connect a GitHub repository and configure its Kubernetes
+                  deployment.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-xl text-slate-500 transition hover:text-slate-200"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <FormField
+                label="Application Name"
+                placeholder="my-store"
+                value={form.appName}
+                onChange={(value) =>
+                  setForm({ ...form, appName: value })
+                }
+              />
+
+              <FormField
+                label="GitHub Repository"
+                placeholder="https://github.com/user/my-store"
+                value={form.repoUrl}
+                onChange={(value) =>
+                  setForm({ ...form, repoUrl: value })
+                }
+              />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  label="Branch"
+                  placeholder="main"
+                  value={form.branch}
+                  onChange={(value) =>
+                    setForm({ ...form, branch: value })
+                  }
+                />
+
+                <FormField
+                  label="Replicas"
+                  type="number"
+                  value={form.replicas}
+                  onChange={(value) =>
+                    setForm({ ...form, replicas: value })
+                  }
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  label="Container Port"
+                  type="number"
+                  value={form.containerPort}
+                  onChange={(value) =>
+                    setForm({ ...form, containerPort: value })
+                  }
+                />
+
+                <FormField
+                  label="Service Port"
+                  type="number"
+                  value={form.servicePort}
+                  onChange={(value) =>
+                    setForm({ ...form, servicePort: value })
+                  }
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-slate-800 pt-5">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="rounded-lg border border-slate-700 px-5 py-2.5 font-medium text-slate-300 transition hover:bg-slate-800"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="rounded-lg bg-emerald-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400"
+                >
+                  Deploy Application
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
+  );
+}
+
+function FormField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-300">
+        {label}
+      </span>
+
+      <input
+        type={type}
+        required
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-emerald-500"
+      />
+    </label>
   );
 }
 
