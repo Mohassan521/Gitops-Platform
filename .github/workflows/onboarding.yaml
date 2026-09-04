@@ -50,18 +50,13 @@ jobs:
       - name: Normalize app name
         id: app
         run: |
-          APP_NAME=$(echo "${{ inputs.app_name }}" \
-            | tr '[:upper:]' '[:lower:]' \
-            | tr ' ' '-' \
-            | tr -cd 'a-z0-9-')
+          APP_NAME=$(echo "${{ inputs.app_name }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-')
 
           echo "name=$APP_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Build image
         run: |
-          docker build \
-            -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ steps.app.outputs.name }}:${{ github.run_id }} \
-            .
+          docker build -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ steps.app.outputs.name }}:${{ github.run_id }} .
 
       - name: Push image
         run: |
