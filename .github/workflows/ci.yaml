@@ -26,7 +26,7 @@ jobs:
      
       
       - name: Build Docker Image
-        run: docker build -f Dockerfile --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }} -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/gitops-platform:${{ github.sha }} .
+        run: docker build -f Dockerfile --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }} --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }} -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/gitops-platform:${{ github.sha }} .
 
       - name: Push Docker Image
         run: docker push ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/gitops-platform:${{ github.sha }}
