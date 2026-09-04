@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect , useState } from "react";
 
 const deploymentInfo = {
   application:
@@ -45,8 +45,20 @@ type ApplicationForm = {
   replicas: string;
 };
 
+type Application = {
+  id: string;
+  app_name: string;
+  repo_url: string;
+  branch: string;
+  container_port: number;
+  service_port: number;
+  replicas: number;
+  status: string;
+};
+
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
+  const [applications, setApplications] = useState<Application[]>([]);
 
   const [form, setForm] = useState<ApplicationForm>({
     appName: "",
@@ -57,13 +69,68 @@ export default function Home() {
     replicas: "1",
   });
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    console.log("Application onboarding request:", form);
+    try {
+    const response = await fetch("/api/application", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(data.error);
+      alert(data.error || "Failed to register application");
+      return;
+    }
+
+    console.log("Application created:", data.application);
+
+    await fetchApplications(); // Refresh the list of applications
+
+    alert("Application registered successfully");
+
+    setForm({
+      appName: "",
+      repoUrl: "",
+      branch: "main",
+      containerPort: "3000",
+      servicePort: "3000",
+      replicas: "1",
+    });
 
     setShowModal(false);
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
   }
+  }
+
+  async function fetchApplications() {
+  try {
+    const response = await fetch("/api/application");
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(data.error);
+      return;
+    }
+
+    setApplications(data.applications);
+  } catch (error) {
+    console.error("Failed to fetch applications:", error);
+  }
+}
+
+useEffect(() => {
+  fetchApplications();
+}, []);
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -151,6 +218,46 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            <section className="mt-10">
+  <div className="mb-6">
+    <p className="text-sm font-medium uppercase tracking-wider text-emerald-400">
+      Applications
+    </p>
+
+    <h2 className="mt-2 text-2xl font-semibold">
+      Onboarded Applications
+    </h2>
+  </div>
+
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {applications.map((app) => (
+      <div
+        key={app.id}
+        className="rounded-xl border border-slate-800 bg-slate-900/60 p-5"
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">
+            {app.app_name}
+          </h3>
+
+          <StatusBadge status={app.status} />
+        </div>
+
+        <p className="mt-3 truncate text-sm text-slate-400">
+          {app.repo_url}
+        </p>
+
+        <div className="mt-4 space-y-2 text-sm text-slate-400">
+          <p>Branch: {app.branch}</p>
+          <p>Replicas: {app.replicas}</p>
+          <p>Container Port: {app.container_port}</p>
+          <p>Service Port: {app.service_port}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
           </div>
 
           <aside className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
